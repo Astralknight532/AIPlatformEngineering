@@ -6,6 +6,8 @@ from unique.fence import fence_uniq
 from unique.cond_2hot import conditions_2hot
 from unique.bsmtfn_type import basement_type
 
+
+### Calling everyone's functions - Stephen Wight
 df_in = pd.read_csv('test.csv')
 df_ID = df_in.Id
 
@@ -26,33 +28,34 @@ df_obj.drop(['Fence','BsmtFinType1','BsmtFinType2', 'Condition1','Condition2'], 
 
 df_obj.fillna('None', inplace=True)
 
-### ONE HOT ENCODER ###
-enc1h = load('OneHotEnc.joblib')
+### ONE HOT ENCODER ### # Stephen Wight
+enc1h = load('OneHotEnc.joblib') # Michael Sriqui
 df_obj = pd.DataFrame(enc1h.transform(df_obj))
 
 ### FILL NUMERICS WITH MEDIANS ###
-col_medians = load('ColumnMedians.joblib')
+col_medians = load('ColumnMedians.joblib') # Michael Sriqui
 df_num.fillna(col_medians, inplace=True)
 
 ### HANDLE SKEW ###
-df_num_skew = load('SkewCols.joblib')
+df_num_skew = load('SkewCols.joblib') # Michael Sriqui
 df_num[df_num_skew] = df_num[df_num_skew].apply(np.log1p)
 
-### FINAL CONCATENATION ###
+### FINAL CONCATENATION ### - Stephen Wight
 df_final = pd.concat([df_obj, df_num],axis=1)
 
-### NORMALIZE ###
-scaler = load('normalizer.joblib')
+### NORMALIZE ### - Stephen Wight
+scaler = load('normalizer.joblib') # Michael Sriqui
 np_final = scaler.transform(df_final)
 
-### PCA ###
-pcaobj = load('pcaObject.joblib')
+### PCA ### - Will Ah Tou
+pcaobj = load('pcaObject.joblib') # Michael Sriqui
 np_final = pcaobj.transform(np_final)
 
-ols = load('OLS.joblib')
-ridge = load('Ridge.joblib')
-sgd = load('SGD.joblib')
+ols = load('OLS.joblib') # Michael Sriqui
+ridge = load('Ridge.joblib') # Michael Sriqui
+sgd = load('SGD.joblib') # Michael Sriqui
 
+### Calling the Prediction method and formatting the output = Stephen Wight
 predict_ols = pd.Series(ols.predict(np_final)).apply(lambda x: x**2).rename('OLS').map('${:,.2f}'.format)
 predict_ridge = pd.Series(ridge.predict(np_final)).apply(lambda x: x**2).rename('Ridge').map('${:,.2f}'.format)
 predict_sgd = pd.Series(sgd.predict(np_final)).apply(lambda x: x**2).rename('SGD').map('${:,.2f}'.format)

@@ -2,7 +2,7 @@
 """
 Created on Mon Jan 13 18:07:58 2020
 
-@author: gmnya
+@author: George Nyamao
 
 This module is for Feature Engineering on the following 
 features:

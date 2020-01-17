@@ -1,3 +1,5 @@
+#George Avitesyan
+
 import pandas as pd
 
 def conditions_2hot(df_in:pd.DataFrame) -> pd.DataFrame:

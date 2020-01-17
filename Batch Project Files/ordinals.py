@@ -8,11 +8,11 @@ def ordinals(df) -> pd.DataFrame:
     ## Put your feature’s information here in the below-outlined format.
     ## Leave a space after each feature.
 
-    ## BsmtExposure
+    ## BsmtExposure - Kyle Cloud
     BsmtExposure_dict = {'Gd': 4, 'Av': 3, 'Mn': 2, 'No':1, 'NA':0}
     BsmtExposure_fillval = 0
 
-    ## Functional
+    ## Functional - John Winegardner
     Functionaldict = {
         "Typ": 0,
         "Min1": 1,
@@ -25,7 +25,7 @@ def ordinals(df) -> pd.DataFrame:
     }
     Functional_fill = 0
 
-    # FireplaceQu
+    # FireplaceQu - John Winegardner
     FireplaceQudict = {
         "Po": 1,
         "Fa": 2,
@@ -36,7 +36,7 @@ def ordinals(df) -> pd.DataFrame:
     }
     FireplaceQu_fill = 0
 
-    # GarageFinish
+    # GarageFinish - John Winegardner
     GarageFinishdict = {
         "Unf": 1,
         "RFn": 2,
@@ -44,11 +44,11 @@ def ordinals(df) -> pd.DataFrame:
     }
     GarageFinish_fill = 0
     
-    # LandSlope
+    # LandSlope - Brandon Jackson
     landSlope_dict = {'Sev':3, 'Mod':2, 'Gtl':1}
     landSlope_fill = 1
 
-    # The Rest
+    # The Rest - Deward Seneh
     generic_dict = {'Ex':5,'Gd':4,'TA':3,'Fa':2,'Po':1,'Na':0}
     generic_list = ['BsmtCond','BsmtQual','GarageQual','GarageCond','PoolQC','ExterQual','KitchenQual','HeatingQC','ExterCond']
     generic_filler = 0
@@ -67,6 +67,7 @@ def ordinals(df) -> pd.DataFrame:
     )
     df.drop(['BsmtExposure', 'Functional', 'FireplaceQu', 'GarageFinish', 'LandSlope'], axis=1, inplace=True)
 
+    # Concatenating the generics - Stephen Wight
     df_generic = pd.concat([ordinalRepl(df[x], generic_dict, generic_filler) for x in generic_list], axis = 1)
     df_out = pd.concat([df_out, df_generic], axis = 1)
     df.drop(generic_list, axis=1, inplace=True)
