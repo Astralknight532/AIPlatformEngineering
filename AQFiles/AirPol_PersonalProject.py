@@ -9,16 +9,29 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import os
-#import math as m
-#import matplotlib.pyplot as plt
+import customfunctions as cf
 
 # Read in the data set
-airpol_data = pd.read_csv("C:/Users/hanan/Desktop/PersonalRepository/AQFiles/pollution_us_2000_2016.csv", encoding = 'utf-8-sig', low_memory = False)
+airpol_data = pd.read_csv(
+    "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/pollution_us_2000_2016.csv",
+    header = 0, 
+    parse_dates = ['Date_Local'],
+    infer_datetime_format = True,
+    index_col = 0,
+    squeeze = True,
+    usecols = ['Index', 'Date_Local', 'NO2_Mean', 'NO2_1stMaxValue', 
+               'NO2_1stMaxHour', 'O3_Mean', 'O3_1stMaxValue', 'O3_1stMaxHour',
+               'SO2_Mean', 'SO2_1stMaxValue', 'SO2_1stMaxHour', 'CO_Mean',
+               'CO_1stMaxValue', 'CO_1stMaxHour'
+               ],
+    encoding = 'utf-8-sig', 
+    low_memory = False
+)
 
 # Get info about the data set
-#print(airpol_data.info())
-#print("The 1st 5 rows of the dataset: \n%s\n" % airpol_data.head())
-#print("The last 5 rows of the dataset: \n%s" % airpol_data.tail())
+print(airpol_data.info())
+print("The 1st 5 rows of the dataset: \n%s\n" % airpol_data.head())
+print("The last 5 rows of the dataset: \n%s" % airpol_data.tail())
 
 # Handling the data so that it can be used for ML/DL 
 # Separate the data by type of pollutant
@@ -48,41 +61,32 @@ o3max = o3max.drop_duplicates('Date_Local')
 co_avg = co_avg.drop_duplicates(['Date_Local', 'CO_Mean'])
 co_max = co_max.drop_duplicates(['Date_Local', 'CO_1stMaxValue'])
 
-# Defining 2 functions to organize repetitive tasks
-# Converts date column to datetime
-def dt_convert(data:pd.Series) -> pd.Series: 
-    data = pd.to_datetime(data.str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-    return data
-# Converts the passed string values into type float64 - extracts strings using regex
-def float_convert(data:pd.Series) -> pd.Series:
-    data = data.str.extract('(\d*\.\d*)').astype('float64')
-    return data
-
-# Converting the Date_Local column to a datetime object and setting it as the index
-no2avg['Date_Local'] = pd.to_datetime(no2avg['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-no2max['Date_Local'] = pd.to_datetime(no2max['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-so2avg['Date_Local'] = pd.to_datetime(so2avg['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-so2max['Date_Local'] = pd.to_datetime(so2max['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-o3avg['Date_Local'] = pd.to_datetime(o3avg['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-o3max['Date_Local'] = pd.to_datetime(o3max['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-co_avg['Date_Local'] = pd.to_datetime(co_avg['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
-co_max['Date_Local'] = pd.to_datetime(co_max['Date_Local'].str.strip(), format = '%Y-%m-%d', errors = 'coerce')
+'''
+# Converting the Date_Local column to a datetime object
+no2avg['Date_Local'] = cf.dt_convert(no2avg['Date_Local'])
+no2max['Date_Local'] = cf.dt_convert(no2max['Date_Local'])
+so2avg['Date_Local'] = cf.dt_convert(so2avg['Date_Local'])
+so2max['Date_Local'] = cf.dt_convert(so2max['Date_Local'])
+o3avg['Date_Local'] = cf.dt_convert(o3avg['Date_Local'])
+o3max['Date_Local'] = cf.dt_convert(o3max['Date_Local'])
+co_avg['Date_Local'] = cf.dt_convert(co_avg['Date_Local'])
+co_max['Date_Local'] = cf.dt_convert(co_max['Date_Local'])
 
 # Some of the data to be analyzed are stored as strings instead of numbers, so
 # conversion is needed (the approach I've chosen requires regex)
 
 # Daily average concentrations of each pollutant
-no2avg['NO2_Mean'] = no2avg['NO2_Mean'].str.extract('(\d*\.\d*)').astype('float64')
+no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 #print(no2avg['NO2_Mean'].head())
 
-so2avg['SO2_Mean'] = so2avg['SO2_Mean'].str.extract('(\d*\.\d*)').astype('float64') 
+so2avg['SO2_Mean'] = cf.float_convert(so2avg['SO2_Mean']) 
 so2avg['SO2_Mean'].fillna(3, inplace = True, limit = 1)
 #print(so2avg['SO2_Mean'].head())
 
-o3avg['O3_Mean'] = o3avg['O3_Mean'].str.extract('(\d*\.\d*)').astype('float64')
+o3avg['O3_Mean'] = cf.float_convert(o3avg['O3_Mean'])
 #print(o3avg['O3_Mean'].head())
 
-co_avg['CO_Mean'] = co_avg['CO_Mean'].str.extract('(\d*\.\d*)').astype('float64')
+co_avg['CO_Mean'] = cf.float_convert(co_avg['CO_Mean'])
 #print(co_avg['CO_Mean'].head())
 
 # Daily max concentrations of each pollutant
@@ -167,3 +171,10 @@ co_fig.update_layout(
 co_fig.update_xaxes(automargin = True)
 co_fig.update_yaxes(automargin = True)
 co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_co.png')
+
+# Plotting the daily max concentration of each pollutant
+# NO2 daily max concentration (in PPB)
+# SO2 daily max concentration (in PPB)
+# O3 daily max concentration (in PPM)
+# CO daily max concentration (in PPM)
+'''
