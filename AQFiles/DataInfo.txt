@@ -1,0 +1,21 @@
+State Code - FIPS code referring to which state the monitoring station is in
+County Code - FIPS code referring to which county the monitoring station is in
+Site Num - unique identifier (within counties) for the monitoring station
+Address - address of the monitoring station
+State - the state the monitoring station is in
+County - the county the monitoring station is in
+City - the city the monitoring station is in
+Date Local - date of when the data for that day was summarized (format: YYYY-MM-DD)
+The 4 pollutants - NO2, O3, SO2, CO
+Pollutants recorded in PPB (parts per billion) - NO2, SO2
+Pollutants recorded in PPM (parts per million) - O3, CO
+
+Each pollutant has 5 features attached: 
+the units used for that pollutant (either PPM or PPB) -> PollutantName+Units
+the average concentration of that pollutant for that day -> PollutantName+Mean
+the highest concentration for that day -> PollutantName+1stMaxValue
+the time of day when the highest value was recorded (using 24-hour time system) -> PollutantName+1stMaxHour
+the air quality index of that pollutant for that day -> PollutantName+AQI (however, some pollutants, like SO2 and CO, only
+half of the rows have values for this feature, may end up dropping this feature)
+
+Possible path for the project - time series problem -> remove features that aren't important to the prediction -> handle the missing values -> decide on how to build the model
