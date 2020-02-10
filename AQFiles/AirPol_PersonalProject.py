@@ -29,9 +29,9 @@ airpol_data = pd.read_csv(
 )
 
 # Get info about the data set
-print(airpol_data.info())
-print("The 1st 5 rows of the dataset: \n%s\n" % airpol_data.head())
-print("The last 5 rows of the dataset: \n%s" % airpol_data.tail())
+#print(airpol_data.info())
+#print("The 1st 5 rows of the dataset: \n%s\n" % airpol_data.head())
+#print("The last 5 rows of the dataset: \n%s" % airpol_data.tail())
 
 # Handling the data so that it can be used for ML/DL 
 # Separate the data by type of pollutant
@@ -61,7 +61,6 @@ o3max = o3max.drop_duplicates('Date_Local')
 co_avg = co_avg.drop_duplicates(['Date_Local', 'CO_Mean'])
 co_max = co_max.drop_duplicates(['Date_Local', 'CO_1stMaxValue'])
 
-'''
 # Converting the Date_Local column to a datetime object
 no2avg['Date_Local'] = cf.dt_convert(no2avg['Date_Local'])
 no2max['Date_Local'] = cf.dt_convert(no2max['Date_Local'])
@@ -77,27 +76,28 @@ co_max['Date_Local'] = cf.dt_convert(co_max['Date_Local'])
 
 # Daily average concentrations of each pollutant
 no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
-#print(no2avg['NO2_Mean'].head())
-
 so2avg['SO2_Mean'] = cf.float_convert(so2avg['SO2_Mean']) 
 so2avg['SO2_Mean'].fillna(3, inplace = True, limit = 1)
-#print(so2avg['SO2_Mean'].head())
-
 o3avg['O3_Mean'] = cf.float_convert(o3avg['O3_Mean'])
-#print(o3avg['O3_Mean'].head())
-
 co_avg['CO_Mean'] = cf.float_convert(co_avg['CO_Mean'])
-#print(co_avg['CO_Mean'].head())
 
 # Daily max concentrations of each pollutant
+print(no2max.head())
+so2max['SO2_1stMaxHour'] = so2max['SO2_1stMaxHour'].astype('int64')
+print(so2max.head())
+o3max['O3_1stMaxHour'] = o3max['O3_1stMaxHour'].astype('int64')
+print(o3max.head())
+co_max['CO_1stMaxHour'] = co_max['CO_1stMaxHour'].astype('int64')
+print(co_max.head())
 
+'''
 # Plotting the daily average concentration of each pollutant
 # Checking for the folder that figures will be saved in, creating it if it doesn't exist
 if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures'):
     os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures')
     
 # NO2 daily avg. concentration (in PPB)
-no2fig = px.scatter(no2avg, x = 'Date_Local', y = 'NO2_Mean', width = 1500, height = 1000)
+no2fig = px.scatter(no2avg, x = 'Date_Local', y = 'NO2_Mean', width = 2000, height = 1000)
 no2fig.add_trace(go.Scatter(
     x = no2avg['Date_Local'],
     y = no2avg['NO2_Mean'],

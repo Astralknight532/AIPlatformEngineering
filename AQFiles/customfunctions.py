@@ -10,7 +10,7 @@ import pandas as pd
 
 # Converts date column to datetime
 def dt_convert(data:pd.Series) -> pd.Series: 
-    data = pd.to_datetime(data.str.strip(), format = '%Y-%m-%d', errors = 'coerce')
+    data = pd.to_datetime(data.str.strip(), format = '%Y-%m-%d', errors = 'ignore')
     return data
 
 # Converts the passed string values into type float64 - extracts strings using regex
