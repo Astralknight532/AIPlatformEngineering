@@ -82,13 +82,11 @@ o3avg['O3_Mean'] = cf.float_convert(o3avg['O3_Mean'])
 co_avg['CO_Mean'] = cf.float_convert(co_avg['CO_Mean'])
 
 # Daily max concentrations of each pollutant
-print(no2max.head())
+# NO2_1stMaxHour is already of type int64, but the other 3 need to be converted to int64 type
+# All max concentrations for each pollutant are already of type float64
 so2max['SO2_1stMaxHour'] = so2max['SO2_1stMaxHour'].astype('int64')
-print(so2max.head())
 o3max['O3_1stMaxHour'] = o3max['O3_1stMaxHour'].astype('int64')
-print(o3max.head())
 co_max['CO_1stMaxHour'] = co_max['CO_1stMaxHour'].astype('int64')
-print(co_max.head())
 
 '''
 # Plotting the daily average concentration of each pollutant
