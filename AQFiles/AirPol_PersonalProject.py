@@ -119,7 +119,7 @@ so2fig.add_trace(go.Scatter(
     x = so2avg['Date_Local'],
     y = so2avg['SO2_Mean'],
     name = 'SO2',
-    line_color = 'red',
+    line_color = 'blue',
     opacity = 0.8    
 ))
 so2fig.update_layout(
@@ -138,7 +138,7 @@ o3fig.add_trace(go.Scatter(
     x = o3avg['Date_Local'],
     y = o3avg['O3_Mean'],
     name = 'O3',
-    line_color = 'red',
+    line_color = 'green',
     opacity = 0.8    
 ))
 o3fig.update_layout(
@@ -157,7 +157,7 @@ co_fig.add_trace(go.Scatter(
     x = co_avg['Date_Local'],
     y = co_avg['CO_Mean'],
     name = 'CO',
-    line_color = 'red',
+    line_color = 'yellow',
     opacity = 0.8    
 ))
 co_fig.update_layout(
