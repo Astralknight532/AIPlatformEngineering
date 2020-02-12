@@ -6,9 +6,17 @@ This is a temporary script file.
 """
 # Import needed libraries
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten, LSTM, RepeatVector, TimeDistributed, Conv1D, MaxPooling1D
+from keras.callbacks import EarlyStopping
+from keras.optimizers import Adam
+from livelossplot.keras import PlotLossesCallback
+from statsmodels.tsa.seasonal import seasonal_decompose
 import plotly.graph_objects as go
 import plotly.express as px
-import os
 import customfunctions as cf
 
 # Read in the data set
@@ -176,3 +184,101 @@ co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigu
 # O3 daily max concentration (in PPM)
 # CO daily max concentration (in PPM)
 '''
+
+def ttb(df, size_test = 24, train_seqlen = 24, fc_len = 12, normalize = False):
+    train_df = df[:-size_test]
+    xtrain, ytrain = window_splitter(train_df)
+    temp = df[:fc_len]
+    temp = pd.concat([df, temp], ignore_index = True)
+    temp[-fc_len:] = np.nan
+    xtest, ytest = window_splitter(temp)
+    xtest = xtest[xtrain.shape[0]:]
+    ytest = ytest[ytrain.shape[0]:]
+    for i in range(fc_len):
+        ytest[i, :(11 - i)] = np.nan
+    if normalize:
+        m = train_df.x.mean()
+        sd = train_df.x.std()
+        xtrain -= m
+        xtrain /= sd
+        xtest -= m
+        xtest /= sd
+    return xtrain, ytrain, xtest, ytest
+
+def window_splitter(train_df, train_seqlen = 24, fc_len = 12):
+    i = 0
+    x, y = [], []
+    while i + train_seqlen + fc_len < len(train_df):
+        x.append(train_df.x[i:(i + train_seqlen)].values)
+        y.append(train_df.x[(i + train_seqlen):(i + train_seqlen + fc_len)].values)
+        i += 1
+    x = np.array(x).reshape(-1, train_seqlen, 1)
+    y = np.array(y).reshape(-1, fc_len)
+    return x, y
+
+series = no2avg.x.values
+res = seasonal_decompose(series, model = 'additive', freq = 12, two_sided = False)
+#plt.plot(res.trend)
+#plt.plot(res.seasonal)
+#plt.plot(res.resid)
+#plt.plot(res.observed)
+#plt.show()
+
+deseason_df = pd.DataFrame({'x':res.trend[12:] + res.resid[12:]})
+print(deseason_df.head())
+
+des_xtrain, des_ytrain, des_xtest, des_ytest = ttb(deseason_df)
+xtrain, ytrain, xtest, ytest = ttb(no2avg)
+print(xtrain.shape, ytrain.shape, xtest.shape, ytrain.shape)
+
+def eval_pred(ypred, ytest) -> pd.DataFrame:
+    return pd.DataFrame(abs(ytest - ypred)).mean(skipna = True)
+    
+def plot_eval(ypred, ytest, n = 12):
+    score = eval_pred(ypred, ytest)
+    print("Mean absolute error test set: ", score.mean())
+    plt.figure(figsize = (6, 4))
+    plt.plot(np.arange(1, 13), score)
+    plt.xticks(np.arange(1, 13))
+    plt.xlabel("horizon [months]", size = 15)
+    plt.ylabel("MAE", size = 15)
+    plt.title("Scores LSTM on test set")
+    plt.show()
+
+    #plt.figure(figsize = (6,4))
+    #plt.title("LSTM forecasting - test set window")
+    #plt.plot(np.arange(1,13), ypred[n:(n + 1)].reshape(-1, 1),label = "predictions")
+    #plt.plot(np.arange(1,13), ytest[n:(n + 1)].reshape(-1, 1),label = "true values")
+    #plt.xticks(np.arange(1, 13))
+    #plt.xlabel("horizon [months]", size = 15)
+    #plt.legend()
+    #plt.show()
+    
+timesteps, features, outputs = xtrain.shape[1], xtrain.shape[2], ytrain.shape[1]
+model = Sequential([
+    LSTM(256, activation = 'relu', input_shape = (None, 1)),
+    Dropout(0.1),
+    Dense(128, activation = 'relu'),
+    Dropout(0.1),
+    Dense(outputs)
+])
+
+model.compile(loss = 'mse', optimizer = Adam(lr = 1e-3), metrics = ["mae"])
+earlystop = EarlyStopping(patience = 32, monitor = 'val_loss', mode = 'auto', restore_best_weights = True)
+cb = [PlotLossesCallback(), earlystop]
+model.fit(
+    des_xtrain,
+    des_ytrain,
+    validation_split = 0.2,
+    epochs = 100,
+    shuffle = True,
+    batch_size = 16,
+    verbose = 1,
+    callbacks = cb
+)
+
+ypred = model.predict(des_xtest)
+for i in np.arange(ypred.shape[0] - 1, -1, -1):
+    ypred[ypred.shape[0]-1-i] += res.seasonal[-(13 + i):-(1 + i)]
+    
+plot_eval(ypred, ytest, n = 12)
