@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import os
 from keras.models import Sequential
-from keras.layers import Dense, LSTM#, Dropout, Flatten, Conv1D, MaxPooling1D
+from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 
 # Read in the data set
@@ -210,7 +210,7 @@ co_fig.update_layout(
 co_fig.update_xaxes(automargin = True)
 co_fig.update_yaxes(automargin = True)
 co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_co.png')
-
+'''
 
 # Trying out the Keras TimeSeriesGenerator functionality
 from numpy import array
@@ -228,14 +228,21 @@ opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
 
 # Defining a simple Multilayer Perceptron model
 mp = Sequential([
-    LSTM(100, activation = 'relu', input_shape = (n_in, n_feat)),
+    LSTM(50, activation = 'relu', input_shape = (n_in, n_feat), return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50),
+    Dropout(0.2),
     Dense(1)
 ])
 mp.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
-history = mp.fit_generator(tsg, steps_per_epoch = 1, epochs = 200, verbose = 0)
+history = mp.fit_generator(tsg, steps_per_epoch = 10, epochs = 500, verbose = 0)
 
 # Plotting the training loss
-plt.rcParams["figure.figsize"] = (20, 10)
+plt.rcParams['figure.figsize'] = (20, 10)
 plt.subplot(211)
 plt.title('Loss')
 plt.plot(history.history['loss'], label = 'train')
@@ -247,10 +254,10 @@ plt.title('Mean Squared Error')
 plt.plot(history.history['mse'], label = 'train')
 #plt.plot(history.history['val_mean_squared_error'], label = 'test')
 plt.legend()
-plt.show()
+# Plotting the actual values vs. the predicted values
 
 # Test prediction
-x_in = array(no2avg['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
+x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
 yhat = mp.predict(x_in, verbose = 0)
-#print(yhat)
-'''
+print(yhat)
+print(no2avg['NO2_Mean'].tail())
