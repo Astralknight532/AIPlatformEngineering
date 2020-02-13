@@ -8,6 +8,7 @@ This is a temporary script file.
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
@@ -15,6 +16,8 @@ import os
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -58,7 +61,6 @@ co_avg['Date_Local'] = cf.dt_convert(co_avg['Date_Local'])
 
 # Some of the data to be analyzed are stored as strings instead of numbers, so
 # conversion is needed (the approach I've chosen requires regex)
-
 # Daily average concentrations of each pollutant
 no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 so2avg['SO2_Mean'] = cf.float_convert(so2avg['SO2_Mean']) 
@@ -86,6 +88,148 @@ for c_co in co_avg['CO_Mean'].values:
 #print(no2avg.head(), so2avg.head(), o3avg.head(), co_avg.head())
 #print(no2avg.info(), so2avg.info(), o3avg.info(), co_avg.info())
     
+# Univariate forecast setup
+TRAIN_SPLIT = 3653
+tf.random.set_seed(15)
+def uni_dt(ds, start_i, end_i, histsize, tgtsize):
+    data = []
+    labels = []
+    start_i = start_i + histsize
+    if end_i is None:
+        end_i = len(ds) - tgtsize
+        
+    for i in range(start_i, end_i):
+        ind = range(i - histsize, i)
+        data.append(np.reshape(ds[ind], (histsize, 1)))
+        labels.append(ds[i + tgtsize])
+        
+    return np.array(data), np.array(labels)
+        
+# NO2 setup
+no2uni = no2avg['NO2_Mean']
+no2uni.index = no2avg['Date_Local']
+no2uni = no2uni.values
+no2uni_mean = no2uni[:TRAIN_SPLIT].mean()
+no2uni_std = no2uni[:TRAIN_SPLIT].std()
+no2uni = (no2uni - no2uni_mean)/no2uni_std 
+#print(no2uni.head())
+#no2uni.plot(subplots = True)
+
+# SO2 setup
+so2uni = so2avg['SO2_Mean']
+so2uni.index = so2avg['Date_Local']
+so2uni = so2uni.values
+so2uni_mean = so2uni[:TRAIN_SPLIT].mean()
+so2uni_std = so2uni[:TRAIN_SPLIT].std()
+so2uni = (so2uni - so2uni_mean)/so2uni_std 
+#print(so2uni.head())
+#so2uni.plot(subplots = True)
+
+# O3 setup
+o3uni = o3avg['O3_Mean']
+o3uni.index = o3avg['Date_Local']
+o3uni = o3uni.values
+o3uni_mean = o3uni[:TRAIN_SPLIT].mean()
+o3uni_std = o3uni[:TRAIN_SPLIT].std()
+o3uni = (o3uni - o3uni_mean)/o3uni_std 
+#print(o3uni.head())
+#o3uni.plot(subplots = True)
+
+# CO setup
+co_uni = co_avg['CO_Mean']
+co_uni.index = co_avg['Date_Local']
+co_uni = co_uni.values
+co_uni_mean = co_uni[:TRAIN_SPLIT].mean()
+co_uni_std = co_uni[:TRAIN_SPLIT].std()
+co_uni = (co_uni - co_uni_mean)/co_uni_std 
+#print(co_uni.head())
+#co_uni.plot(subplots = True)
+
+# Creating the models
+# NO2 model
+no2_hist = 20
+no2_tgt = 0
+no2_xtrain, no2_ytrain = uni_dt(no2uni, 0, TRAIN_SPLIT, no2_hist, no2_tgt)
+no2_xvaluni, no2_yvaluni = uni_dt(no2uni, TRAIN_SPLIT, None, no2_hist, no2_tgt)
+#print('1 window of past history: \n%s\n' % no2_xtrain[0])
+#print('Target NO2 concentration to predict: \n%s' % no2_ytrain[0])
+def create_ts(l):
+    return list(range(-l, 0))
+
+def showplot(plotdata, d, t):
+    labels = ['History', 'True Future', 'Model Prediction']
+    marker = ['.-', 'rx', 'go']
+    ts = create_ts(plotdata[0].shape[0])
+    if d:
+        future = d
+    else:
+        future = 0
+    
+    plt.title(t)
+    for i, x in enumerate(plotdata):
+        if i:
+            plt.plot(future, plotdata[i], marker[i], markersize = 10, label = labels[i])
+        else:
+            plt.plot(ts, plotdata[i].flatten(), marker[i], label = labels[i])
+    plt.legend()
+    plt.xlim([ts[0], (future + 5) * 2])
+    plt.xlabel('Time_Step')
+    return plt
+
+#showplot([no2_xtrain[0], no2_ytrain[0]], 0, 'Sample Example')
+
+def baseline(h):
+    return np.mean(h)
+
+#showplot([no2_xtrain[0], no2_ytrain[0], baseline(no2_xtrain[0])], 0, 'Baseline Prediction Example')
+
+BATCH_SIZE = 256
+BUFFER_SIZE = 10000
+
+train_no2uni = tf.data.Dataset.from_tensor_slices((no2_xtrain, no2_ytrain))
+train_no2uni = train_no2uni.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+val_no2uni = tf.data.Dataset.from_tensor_slices((no2_xvaluni, no2_yvaluni))
+val_no2uni = val_no2uni.batch(BATCH_SIZE).repeat()
+
+# Define the structure of the model
+mp = Sequential([
+    LSTM(50, activation = 'relu', input_shape = no2_xtrain.shape[-2:], return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50),
+    Dropout(0.2),
+    Dense(1)
+])
+
+EVAL_INT = 10
+EPOCHS = 500
+opt = SGD( #alternative optimizer to try
+    lr = 0.01, 
+    momentum = 0.9, 
+    nesterov = True
+) 
+mp.compile(
+    optimizer = 'adam', 
+    loss = 'mean_squared_logarithmic_error', 
+    metrics = ['mse']
+)
+mp.fit(
+    train_no2uni, 
+    steps_per_epoch = EVAL_INT, 
+    epochs = EPOCHS, 
+    verbose = 0, 
+    validation_data = val_no2uni, 
+    validation_steps = 50
+)
+
+for x, y in val_no2uni.take(3):
+    plot = showplot([x[0].numpy(), y[0].numpy(), mp.predict(x)[0]], 0, 'LSTM Model')
+    plot.show()
+
+'''       
 # Splitting the data into train & test sets based on the date
 # NO2 sets
 no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
@@ -104,7 +248,7 @@ co_mask_train = (co_avg['Date_Local'] < '2010-01-01')
 co_mask_test = (co_avg['Date_Local'] >= '2010-01-01')
 co_train, co_test = co_avg.loc[co_mask_train], co_avg.loc[co_mask_test]
 
-#print("NO2 training set info: \n%s\n" % no2train.info())
+#print("NO2 training set info: \n%s\n" % no2train.info()) #3653 train, 366 test
 #print("NO2 testing set info: \n%s\n" % no2test.info())
 #print(so2train.info("SO2 training set info: \n%s\n" % so2train.info()))
 #print(so2test.info("SO2 testing set info: \n%s\n" % so2test.info()))
@@ -112,6 +256,7 @@ co_train, co_test = co_avg.loc[co_mask_train], co_avg.loc[co_mask_test]
 #print(o3test.info("O3 testing set info: \n%s\n" % o3train.info()))
 #print(co_train.info("CO training set info: \n%s\n" % co_train.info()))
 #print(co_test.info("CO testing set info: \n%s" % co_train.info()))
+'''
 
 '''
 # Plotting the daily average concentration of each pollutant
@@ -211,7 +356,7 @@ co_fig.update_xaxes(automargin = True)
 co_fig.update_yaxes(automargin = True)
 co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_co.png')
 '''
-
+'''
 # Trying out the Keras TimeSeriesGenerator functionality
 from numpy import array
 from keras.preprocessing.sequence import TimeseriesGenerator
@@ -261,3 +406,4 @@ x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
 yhat = mp.predict(x_in, verbose = 0)
 print(yhat)
 print(no2avg['NO2_Mean'].tail())
+'''
