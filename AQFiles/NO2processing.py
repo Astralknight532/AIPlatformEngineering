@@ -34,30 +34,20 @@ airpol_data = pd.read_csv(
 #print("The 1st 5 rows of the dataset: \n%s\n" % airpol_data.head())
 #print("The last 5 rows of the dataset: \n%s" % airpol_data.tail())
 
-# Handling the data so that it can be used for ML/DL 
-# Separate the data by type of pollutant
-# Note: Date_Local is written as YYYY-MM-DD
-# These 2 chemicals' concentrations are recorded in PPB (parts per billion)
+# Selecting the columns of NO2 data
+# NO2 concentration is in parts per billion,  Date_Local is in the format YYYY-MM-DD
 no2avg = airpol_data[['Date_Local', 'NO2_Mean']]
 
 # Handling duplicate rows in each dataframe
 no2avg = no2avg.drop_duplicates('Date_Local') # NO2 dataframe
 
-# Converting the Date_Local column to a datetime object
+# Some of the data is stored as strings instead of numbers, so conversion is needed
 no2avg['Date_Local'] = cf.dt_convert(no2avg['Date_Local'])
-
-# Some of the data to be analyzed are stored as strings instead of numbers, so
-# conversion is needed (the approach I've chosen requires regex)
-# Daily average concentrations of each pollutant
 no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 
-# Since there are null values in the data, I've chosen to fill them with the mean
-# Null values in the Mean Concentration column in the NO2 dataframe
+# Handle null values in the data
 for c_no2 in no2avg['NO2_Mean'].values:
     no2avg['NO2_Mean'] = no2avg['NO2_Mean'].fillna(no2avg['NO2_Mean'].mean())
-
-#print(no2avg.head())
-#print(no2avg.info())
 
 from statsmodels.tsa.arima_model import ARIMA
 # Univariate forecast setup
