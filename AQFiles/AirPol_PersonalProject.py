@@ -8,14 +8,15 @@ This is a temporary script file.
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
 import numpy as np
-import tensorflow as tf
+import math as m
+#import tensorflow as tf
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
 import os
-from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout
-from keras.optimizers import SGD
+#from keras.models import Sequential
+#from keras.layers import Dense, LSTM, Dropout
+#from keras.optimizers import SGD
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
@@ -108,8 +109,8 @@ for t in range(len(no2test)):
     no2hist.append(obs)
     #print('Predicted = %f, Expected = %f' % (yhat, obs))
 
-no2error = mean_squared_error(no2test, pred)
-print('NO2 Test MSE: %.3f' % no2error)
+no2error = m.sqrt(mean_squared_error(no2test, pred))
+print('NO2 Test RMSE: %.3f' % no2error)
 plt.rcParams['figure.figsize'] = (20, 10)
 plt.title('US Daily Avg. NO2 Concentration')
 plt.xlabel('Time')
