@@ -87,7 +87,39 @@ for c_co in co_avg['CO_Mean'].values:
 
 #print(no2avg.head(), so2avg.head(), o3avg.head(), co_avg.head())
 #print(no2avg.info(), so2avg.info(), o3avg.info(), co_avg.info())
-    
+
+from statsmodels.tsa.arima_model import ARIMA
+# Univariate forecast setup
+# NO2 setup
+no2uni = no2avg['NO2_Mean']
+no2uni.index = no2avg['Date_Local']
+no2uni = no2uni.values
+no2size = int(len(no2uni) * 0.66)
+no2train, no2test = no2uni[0:no2size], no2uni[no2size:len(no2uni)]
+no2hist = [x for x in no2train]
+pred = list()
+for t in range(len(no2test)):
+    no2mod = ARIMA(no2hist, order = (5,1,1))
+    no2modfit = no2mod.fit(disp = 0)
+    no2out = no2modfit.forecast()
+    yhat = no2out[0]
+    pred.append(yhat)
+    obs = no2test[t]
+    no2hist.append(obs)
+    #print('Predicted = %f, Expected = %f' % (yhat, obs))
+
+no2error = mean_squared_error(no2test, pred)
+print('NO2 Test MSE: %.3f' % no2error)
+plt.rcParams['figure.figsize'] = (20, 10)
+plt.title('US Daily Avg. NO2 Concentration')
+plt.xlabel('Time')
+plt.ylabel('Daily Avg. NO2 Conc. (PPB)')
+plt.plot(no2test, label = 'Test')
+plt.plot(pred, color = 'red', label = 'Predict')
+plt.legend()
+plt.show()
+
+''' 
 # Univariate forecast setup
 TRAIN_SPLIT = 3653
 tf.random.set_seed(15)
@@ -228,34 +260,6 @@ mp.fit(
 for x, y in val_no2uni.take(3):
     plot = showplot([x[0].numpy(), y[0].numpy(), mp.predict(x)[0]], 0, 'LSTM Model')
     plot.show()
-
-'''       
-# Splitting the data into train & test sets based on the date
-# NO2 sets
-no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
-no2mask_test = (no2avg['Date_Local'] >= '2010-01-01')
-no2train, no2test = no2avg.loc[no2mask_train], no2avg.loc[no2mask_test]
-# SO2 sets
-so2mask_train = (so2avg['Date_Local'] < '2010-01-01')
-so2mask_test = (so2avg['Date_Local'] >= '2010-01-01')
-so2train, so2test = so2avg.loc[so2mask_train], so2avg.loc[so2mask_test]
-# O3 sets
-o3mask_train = (o3avg['Date_Local'] < '2010-01-01')
-o3mask_test = (o3avg['Date_Local'] >= '2010-01-01')
-o3train, o3test = o3avg.loc[o3mask_train], o3avg.loc[o3mask_test]
-# CO sets
-co_mask_train = (co_avg['Date_Local'] < '2010-01-01')
-co_mask_test = (co_avg['Date_Local'] >= '2010-01-01')
-co_train, co_test = co_avg.loc[co_mask_train], co_avg.loc[co_mask_test]
-
-#print("NO2 training set info: \n%s\n" % no2train.info()) #3653 train, 366 test
-#print("NO2 testing set info: \n%s\n" % no2test.info())
-#print(so2train.info("SO2 training set info: \n%s\n" % so2train.info()))
-#print(so2test.info("SO2 testing set info: \n%s\n" % so2test.info()))
-#print(o3train.info("O3 training set info: \n%s\n" % o3train.info()))
-#print(o3test.info("O3 testing set info: \n%s\n" % o3train.info()))
-#print(co_train.info("CO training set info: \n%s\n" % co_train.info()))
-#print(co_test.info("CO testing set info: \n%s" % co_train.info()))
 '''
 
 '''
@@ -271,7 +275,7 @@ no2fig.add_trace(go.Scatter(
     y = no2avg['NO2_Mean'],
     name = 'NO2',
     line_color = 'red',
-    opacity = 0.8    
+    opacity = 0.8  
 ))
 no2fig.update_layout(
     xaxis_range = ['2000-01-01', '2011-12-31'], 
@@ -293,8 +297,8 @@ so2fig.add_trace(go.Scatter(
     x = so2avg['Date_Local'],
     y = so2avg['SO2_Mean'],
     name = 'SO2',
-    line_color = 'blue',
-    opacity = 0.8    
+    line_color = 'black',
+    opacity = 0.8  
 ))
 so2fig.update_layout(
     xaxis_range = ['2000-01-01', '2011-12-31'], 
@@ -317,7 +321,7 @@ o3fig.add_trace(go.Scatter(
     y = o3avg['O3_Mean'],
     name = 'O3',
     line_color = 'green',
-    opacity = 0.8    
+    opacity = 0.8  
 ))
 o3fig.update_layout(
     xaxis_range = ['2000-01-01', '2011-12-31'], 
@@ -356,8 +360,36 @@ co_fig.update_xaxes(automargin = True)
 co_fig.update_yaxes(automargin = True)
 co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_co.png')
 '''
+
 '''
-# Trying out the Keras TimeSeriesGenerator functionality
+# Splitting the data into train & test sets based on the date
+# NO2 sets
+no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
+no2mask_test = (no2avg['Date_Local'] >= '2010-01-01')
+no2train, no2test = no2avg.loc[no2mask_train], no2avg.loc[no2mask_test]
+# SO2 sets
+so2mask_train = (so2avg['Date_Local'] < '2010-01-01')
+so2mask_test = (so2avg['Date_Local'] >= '2010-01-01')
+so2train, so2test = so2avg.loc[so2mask_train], so2avg.loc[so2mask_test]
+# O3 sets
+o3mask_train = (o3avg['Date_Local'] < '2010-01-01')
+o3mask_test = (o3avg['Date_Local'] >= '2010-01-01')
+o3train, o3test = o3avg.loc[o3mask_train], o3avg.loc[o3mask_test]
+# CO sets
+co_mask_train = (co_avg['Date_Local'] < '2010-01-01')
+co_mask_test = (co_avg['Date_Local'] >= '2010-01-01')
+co_train, co_test = co_avg.loc[co_mask_train], co_avg.loc[co_mask_test]
+
+#print("NO2 training set info: \n%s\n" % no2train.info()) #3653 train, 366 test
+#print("NO2 testing set info: \n%s\n" % no2test.info())
+#print(so2train.info("SO2 training set info: \n%s\n" % so2train.info()))
+#print(so2test.info("SO2 testing set info: \n%s\n" % so2test.info()))
+#print(o3train.info("O3 training set info: \n%s\n" % o3train.info()))
+#print(o3test.info("O3 testing set info: \n%s\n" % o3train.info()))
+#print(co_train.info("CO training set info: \n%s\n" % co_train.info()))
+#print(co_test.info("CO testing set info: \n%s" % co_train.info()))
+
+# Trying out the Keras TimeSeriesGenerator functionality with a LSTM model
 from numpy import array
 from keras.preprocessing.sequence import TimeseriesGenerator
 
@@ -404,6 +436,6 @@ plt.legend()
 # Test prediction
 x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
 yhat = mp.predict(x_in, verbose = 0)
-print(yhat)
+print('Predicted daily avg. NO2 concentration: %s parts per billion' % yhat[0][0])
 print(no2avg['NO2_Mean'].tail())
 '''
