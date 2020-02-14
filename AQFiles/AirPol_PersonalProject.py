@@ -103,11 +103,11 @@ for t in range(len(no2test)):
     no2mod = ARIMA(no2hist, order = (5,1,1))
     no2modfit = no2mod.fit(disp = 0)
     no2out = no2modfit.forecast()
-    yhat = no2out[0]
-    pred.append(yhat)
+    no2_yhat = no2out[0]
+    pred.append(no2_yhat)
     obs = no2test[t]
     no2hist.append(obs)
-    #print('Predicted = %f, Expected = %f' % (yhat, obs))
+    #print('Predicted = %f, Expected = %f' % (no2_yhat, obs))
 
 no2error = m.sqrt(mean_squared_error(no2test, pred))
 print('NO2 Test RMSE: %.3f' % no2error)
