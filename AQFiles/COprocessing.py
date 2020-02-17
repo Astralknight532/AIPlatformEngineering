@@ -8,9 +8,7 @@ Created on Fri Feb 14 15:31:23 2020
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
-#import numpy as np
 #import math as m
-#import tensorflow as tf
 #import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
@@ -18,8 +16,7 @@ import pandas as pd
 #from keras.models import Sequential
 #from keras.layers import Dense, LSTM, Dropout
 #from keras.optimizers import SGD
-#from sklearn.preprocessing import MinMaxScaler
-#from sklearn.metrics import mean_squared_error
+
 
 # Read in the data set
 airpol_data = pd.read_csv(
