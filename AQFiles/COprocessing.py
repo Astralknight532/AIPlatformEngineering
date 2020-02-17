@@ -8,18 +8,18 @@ Created on Fri Feb 14 15:31:23 2020
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
-import numpy as np
-import math as m
+#import numpy as np
+#import math as m
 #import tensorflow as tf
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import plotly.express as px
-import os
+#import matplotlib.pyplot as plt
+#import plotly.graph_objects as go
+#import plotly.express as px
+#import os
 #from keras.models import Sequential
 #from keras.layers import Dense, LSTM, Dropout
 #from keras.optimizers import SGD
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
+#from sklearn.preprocessing import MinMaxScaler
+#from sklearn.metrics import mean_squared_error
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -77,39 +77,4 @@ co_fig.update_layout(
 co_fig.update_xaxes(automargin = True)
 co_fig.update_yaxes(automargin = True)
 co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_co.png')
-
-# Split the data into train/test sets based on date
-co_mask_train = (co_avg['Date_Local'] < '2010-01-01')
-co_mask_test = (co_avg['Date_Local'] >= '2010-01-01')
-co_train, co_test = co_avg.loc[co_mask_train], co_avg.loc[co_mask_test]
-
-#print(co_train.info("CO training set info: \n%s\n" % co_train.info()))
-#print(co_test.info("CO testing set info: \n%s" % co_train.info()))
-
-# Univariate forecast setup
-TRAIN_SPLIT = 3653
-tf.random.set_seed(15)
-def uni_dt(ds, start_i, end_i, histsize, tgtsize):
-    data = []
-    labels = []
-    start_i = start_i + histsize
-    if end_i is None:
-        end_i = len(ds) - tgtsize
-        
-    for i in range(start_i, end_i):
-        ind = range(i - histsize, i)
-        data.append(np.reshape(ds[ind], (histsize, 1)))
-        labels.append(ds[i + tgtsize])
-        
-    return np.array(data), np.array(labels)
-
-# CO setup
-co_uni = co_avg['CO_Mean']
-co_uni.index = co_avg['Date_Local']
-co_uni = co_uni.values
-co_uni_mean = co_uni[:TRAIN_SPLIT].mean()
-co_uni_std = co_uni[:TRAIN_SPLIT].std()
-co_uni = (co_uni - co_uni_mean)/co_uni_std 
-#print(co_uni.head())
-#co_uni.plot(subplots = True)
 '''

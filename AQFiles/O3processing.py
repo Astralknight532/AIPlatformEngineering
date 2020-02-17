@@ -8,18 +8,18 @@ Created on Fri Feb 14 15:31:17 2020
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
-import numpy as np
-import math as m
+#import numpy as np
+#import math as m
 #import tensorflow as tf
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import plotly.express as px
-import os
+#import matplotlib.pyplot as plt
+#import plotly.graph_objects as go
+#import plotly.express as px
+#import os
 #from keras.models import Sequential
 #from keras.layers import Dense, LSTM, Dropout
 #from keras.optimizers import SGD
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
+#from sklearn.preprocessing import MinMaxScaler
+#from sklearn.metrics import mean_squared_error
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -77,39 +77,4 @@ o3fig.update_layout(
 o3fig.update_xaxes(automargin = True)
 o3fig.update_yaxes(automargin = True)
 o3fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_o3.png')
-
-# Split the data into train/test sets based on the date
-o3mask_train = (o3avg['Date_Local'] < '2010-01-01')
-o3mask_test = (o3avg['Date_Local'] >= '2010-01-01')
-o3train, o3test = o3avg.loc[o3mask_train], o3avg.loc[o3mask_test]
-
-#print(o3train.info("O3 training set info: \n%s\n" % o3train.info()))
-#print(o3test.info("O3 testing set info: \n%s\n" % o3train.info()))
-
-# Univariate forecast setup
-TRAIN_SPLIT = 3653
-tf.random.set_seed(15)
-def uni_dt(ds, start_i, end_i, histsize, tgtsize):
-    data = []
-    labels = []
-    start_i = start_i + histsize
-    if end_i is None:
-        end_i = len(ds) - tgtsize
-        
-    for i in range(start_i, end_i):
-        ind = range(i - histsize, i)
-        data.append(np.reshape(ds[ind], (histsize, 1)))
-        labels.append(ds[i + tgtsize])
-        
-    return np.array(data), np.array(labels)
-    
-# O3 setup
-o3uni = o3avg['O3_Mean']
-o3uni.index = o3avg['Date_Local']
-o3uni = o3uni.values
-o3uni_mean = o3uni[:TRAIN_SPLIT].mean()
-o3uni_std = o3uni[:TRAIN_SPLIT].std()
-o3uni = (o3uni - o3uni_mean)/o3uni_std 
-#print(o3uni.head())
-#o3uni.plot(subplots = True)
 '''
