@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 14 15:31:23 2020
-
-@author: hanan
-"""
 
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
-#import math as m
-#import matplotlib.pyplot as plt
+import math as m
+import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Dropout
+from keras.optimizers import SGD
+from keras.preprocessing.sequence import TimeseriesGenerator
+from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
 #import os
-#from keras.models import Sequential
-#from keras.layers import Dense, LSTM, Dropout
-#from keras.optimizers import SGD
-
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -50,6 +46,60 @@ co_avg['CO_Mean'] = cf.float_convert(co_avg['CO_Mean'])
 # Handle null values in the data
 for c_co in co_avg['CO_Mean'].values:
     co_avg['CO_Mean'] = co_avg['CO_Mean'].fillna(co_avg['CO_Mean'].mean())
+    
+# Splitting the data into train & test sets based on the date
+comask_train = (co_avg['Date_Local'] < '2010-01-01')
+comask_test = (co_avg['Date_Local'] >= '2010-01-01')
+co_train, co_test = co_avg.loc[comask_train], co_avg.loc[comask_test]
+
+#print("O3 training set info: \n%s\n" % o3train.info()) #3653 train, 366 test
+#print("O3 testing set info: \n%s\n" % o3test.info())
+
+# Using the Keras TimeSeriesGenerator functionality to build a LSTM model
+ser = array(co_avg['CO_Mean'].values)
+n_feat = 1
+ser = ser.reshape((len(ser), n_feat))
+n_in = 2
+tsg = TimeseriesGenerator(ser, ser, length = n_in, batch_size = 20)
+print('Number of samples: %d' % len(tsg))
+
+# Defining an alternative optimizer
+opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
+
+# Defining a model
+mp = Sequential([
+    LSTM(50, activation = 'relu', input_shape = (n_in, n_feat), return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50),
+    Dropout(0.2),
+    Dense(1)
+])
+mp.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
+history = mp.fit_generator(tsg, steps_per_epoch = 10, epochs = 500, verbose = 0)
+
+# Test prediction
+x_in = array(co_test['CO_Mean'].tail(2)).reshape((1, n_in, n_feat))
+yhat = mp.predict(x_in, verbose = 0)
+print('Predicted daily avg. CO concentration: %s parts per million' % yhat[0][0])
+#print(so2avg['SO2_Mean'].tail())
+
+# Plotting the metrics
+plt.rcParams['figure.figsize'] = (20, 10)
+plt.title('LSTM Model Metrics')
+plt.xlabel('Epochs')
+plt.ylabel('Model Error')
+plt.plot(history.history['mse'], label = 'MSE', color = 'red')
+plt.plot(history.history['loss'], label = 'MSLE', color = 'blue')
+for i in range(len(history.history['mse'])):
+    history.history['mse'][i] = m.sqrt(history.history['mse'][i])
+    
+plt.plot(history.history['mse'], label = 'RMSE', color = 'green')
+plt.legend()
+plt.show()
     
 '''
 # CO daily avg. concentration (in PPM)

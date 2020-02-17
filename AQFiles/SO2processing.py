@@ -1,21 +1,18 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 14 15:30:46 2020
-
-@author: hanan
-"""
 
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
 import math as m
 import matplotlib.pyplot as plt
-#import plotly.graph_objects as go
-#import plotly.express as px
-#import os
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
+from keras.preprocessing.sequence import TimeseriesGenerator
+from numpy import array
+#import plotly.graph_objects as go
+#import plotly.express as px
+#import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -52,18 +49,14 @@ for c_so2 in so2avg['SO2_Mean'].values:
     so2avg['SO2_Mean'] = so2avg['SO2_Mean'].fillna(so2avg['SO2_Mean'].mean())
 
 # Splitting the data into train & test sets based on the date
-# NO2 sets
 so2mask_train = (so2avg['Date_Local'] < '2010-01-01')
 so2mask_test = (so2avg['Date_Local'] >= '2010-01-01')
 so2train, so2test = so2avg.loc[so2mask_train], so2avg.loc[so2mask_test]
 
-#print("NO2 training set info: \n%s\n" % no2train.info()) #3653 train, 366 test
-#print("NO2 testing set info: \n%s\n" % no2test.info())
+#print("SO2 training set info: \n%s\n" % so2train.info()) #3653 train, 366 test
+#print("SO2 testing set info: \n%s\n" % so2test.info())
 
-# Trying out the Keras TimeSeriesGenerator functionality with a LSTM model
-from numpy import array
-from keras.preprocessing.sequence import TimeseriesGenerator
-
+# Using the Keras TimeSeriesGenerator functionality to build a LSTM model
 ser = array(so2avg['SO2_Mean'].values)
 n_feat = 1
 ser = ser.reshape((len(ser), n_feat))

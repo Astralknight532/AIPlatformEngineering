@@ -4,14 +4,15 @@
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
 import math as m
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Dropout
+from keras.optimizers import SGD
+from keras.preprocessing.sequence import TimeseriesGenerator
+from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
 #import os
-#from keras.models import Sequential
-#from keras.layers import Dense, LSTM, Dropout
-#from keras.optimizers import SGD
-from sklearn.metrics import mean_squared_error
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -46,39 +47,59 @@ no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 for c_no2 in no2avg['NO2_Mean'].values:
     no2avg['NO2_Mean'] = no2avg['NO2_Mean'].fillna(no2avg['NO2_Mean'].mean())
 
-from statsmodels.tsa.arima_model import ARIMA
-# Univariate forecast setup
-# NO2 setup
-no2uni = no2avg['NO2_Mean']
-no2uni.index = no2avg['Date_Local']
-no2uni = no2uni.values
-no2size = int(len(no2uni) * 0.66)
-no2train, no2test = no2uni[0:no2size], no2uni[no2size:len(no2uni)]
-no2hist = [x for x in no2train]
-pred = list()
-for t in range(len(no2test)):
-    no2mod = ARIMA(no2hist, order = (5,1,1))
-    no2modfit = no2mod.fit(disp = 0)
-    no2out = no2modfit.forecast()
-    no2_yhat = no2out[0]
-    pred.append(no2_yhat)
-    obs = no2test[t]
-    no2hist.append(obs)
-    #print('Predicted = %f, Expected = %f' % (no2_yhat, obs))
+# Splitting the data into train & test sets based on the date
+no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
+no2mask_test = (no2avg['Date_Local'] >= '2010-01-01')
+no2train, no2test = no2avg.loc[no2mask_train], no2avg.loc[no2mask_test]
 
-no2error = m.sqrt(mean_squared_error(no2test, pred))
-print('NO2 Test RMSE: %.3f' % no2error)
-'''
+#print("NO2 training set info: \n%s\n" % no2train.info()) #3653 train, 366 test
+#print("NO2 testing set info: \n%s\n" % no2test.info())
+
+# Using the Keras TimeSeriesGenerator functionality to build a LSTM model
+ser = array(no2avg['NO2_Mean'].values)
+n_feat = 1
+ser = ser.reshape((len(ser), n_feat))
+n_in = 2
+tsg = TimeseriesGenerator(ser, ser, length = n_in, batch_size = 20)
+print('Number of samples: %d' % len(tsg))
+
+# Defining an alternative optimizer
+opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
+
+# Defining a model
+mp = Sequential([
+    LSTM(50, activation = 'relu', input_shape = (n_in, n_feat), return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50, return_sequences = True),
+    Dropout(0.2),
+    LSTM(50),
+    Dropout(0.2),
+    Dense(1)
+])
+mp.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
+history = mp.fit_generator(tsg, steps_per_epoch = 10, epochs = 500, verbose = 0)
+
+# Test prediction
+x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
+yhat = mp.predict(x_in, verbose = 0)
+print('Predicted daily avg. NO2 concentration: %s parts per billion' % yhat[0][0])
+#print(so2avg['SO2_Mean'].tail())
+
+# Plotting the metrics
 plt.rcParams['figure.figsize'] = (20, 10)
-plt.title('US Daily Avg. NO2 Concentration')
-plt.xlabel('Time')
-plt.ylabel('Daily Avg. NO2 Conc. (PPB)')
-plt.plot(no2test, label = 'Test')
-plt.plot(pred, color = 'red', label = 'Predict')
+plt.title('LSTM Model Metrics')
+plt.xlabel('Epochs')
+plt.ylabel('Model Error')
+plt.plot(history.history['mse'], label = 'MSE', color = 'red')
+plt.plot(history.history['loss'], label = 'MSLE', color = 'blue')
+for i in range(len(history.history['mse'])):
+    history.history['mse'][i] = m.sqrt(history.history['mse'][i])
+    
+plt.plot(history.history['mse'], label = 'RMSE', color = 'green')
 plt.legend()
 plt.show()
-
-'''
 
 '''
 # Plotting the daily average concentration of each pollutant

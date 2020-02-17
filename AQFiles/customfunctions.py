@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Feb  7 15:46:45 2020
 
-@author: hanan
-"""
 import pandas as pd
 
 # Defining functions to organize repetitive tasks
