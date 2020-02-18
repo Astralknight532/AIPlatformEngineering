@@ -12,9 +12,19 @@
         <p> By: Hanan Kwok</p>
     </header>
 
-    <form action="/", method="POST", enctype="multipart/form-data">
-        <input type="file", name="img", accept="image/*">
-        <input type="submit" value="Submit">
+    <form action="/", method="POST", id="AQform">
+        <p>Enter a date (format: YYYY-MM-DD):</p>
+        <input type="text" placeholder="YYYY-MM-DD" id="dateentry"/>
+        <p>Choose a pollutant:</p>
+        <select form="AQform" id="pollutantselect">
+            <option>NO2</option>
+            <option>SO2</option>
+            <option>O3</option>
+            <option>CO</option>
+        </select>
+        <p>
+            <input type="submit" value="Get Prediction"/>
+        </p>
     </form>
     {% block result %}
     {% endblock %}
