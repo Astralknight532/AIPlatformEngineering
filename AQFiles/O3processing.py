@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
+from keras.callbacks import ModelCheckpoint
 from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
@@ -67,7 +68,7 @@ print('Number of samples: %d' % len(tsg))
 opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
 
 # Defining a model
-mp = Sequential([
+o3mod = Sequential([
     LSTM(50, activation = 'relu', input_shape = (n_in, n_feat), return_sequences = True),
     Dropout(0.2),
     LSTM(50, return_sequences = True),
@@ -78,14 +79,26 @@ mp = Sequential([
     Dropout(0.2),
     Dense(1)
 ])
-mp.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
-history = mp.fit_generator(tsg, steps_per_epoch = 10, epochs = 500, verbose = 0)
+
+# Creating a checkpoint for saving the model
+o3_cp = ModelCheckpoint('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/O3model/o3cp.ckpt', save_best_only = True)
+
+# Compiling & fitting the model
+o3mod.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
+history = o3mod.fit_generator(
+    tsg, 
+    steps_per_epoch = 10, 
+    epochs = 500,
+    callbacks = [o3_cp],
+    validation_data = o3test,
+    verbose = 0
+)
 
 # Test prediction
 x_in = array(o3test['O3_Mean'].tail(2)).reshape((1, n_in, n_feat))
-yhat = mp.predict(x_in, verbose = 0)
-print('Predicted daily avg. O3 concentration: %s parts per million' % yhat[0][0])
-#print(so2avg['SO2_Mean'].tail())
+o3pred = o3mod.predict(x_in, verbose = 0)
+print('Predicted daily avg. O3 concentration: %.3f parts per million' % o3pred[0][0])
+#print(o3avg['O3_Mean'].tail())
 
 # Plotting the metrics
 plt.rcParams['figure.figsize'] = (20, 10)

@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
+from keras.callbacks import ModelCheckpoint
 from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
@@ -68,7 +69,7 @@ print('Number of samples: %d' % len(tsg))
 opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
 
 # Defining a model
-mp = Sequential([
+so2mod = Sequential([
     LSTM(50, activation = 'relu', input_shape = (n_in, n_feat), return_sequences = True),
     Dropout(0.2),
     LSTM(50, return_sequences = True),
@@ -79,13 +80,25 @@ mp = Sequential([
     Dropout(0.2),
     Dense(1)
 ])
-mp.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
-history = mp.fit_generator(tsg, steps_per_epoch = 10, epochs = 500, verbose = 0)
+
+# Creating a checkpoint for saving the model
+so2_cp = ModelCheckpoint('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SO2model/so2cp.ckpt', save_best_only = True)
+
+# Compiling & fitting the model
+so2mod.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
+history = so2mod.fit_generator(
+    tsg, 
+    steps_per_epoch = 10,
+    epochs = 500,
+    callbacks = [so2_cp],
+    validation_data = so2test,
+    verbose = 0
+)
 
 # Test prediction
 x_in = array(so2test['SO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
-yhat = mp.predict(x_in, verbose = 0)
-print('Predicted daily avg. SO2 concentration: %s parts per billion' % yhat[0][0])
+so2pred = so2mod.predict(x_in, verbose = 0)
+print('Predicted daily avg. SO2 concentration: %.3f parts per billion' % so2pred[0][0])
 #print(so2avg['SO2_Mean'].tail())
 
 # Plotting the metrics

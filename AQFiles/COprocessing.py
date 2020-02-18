@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
+from keras.callbacks import ModelCheckpoint
 from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
@@ -67,7 +68,7 @@ print('Number of samples: %d' % len(tsg))
 opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
 
 # Defining a model
-mp = Sequential([
+co_mod = Sequential([
     LSTM(50, activation = 'relu', input_shape = (n_in, n_feat), return_sequences = True),
     Dropout(0.2),
     LSTM(50, return_sequences = True),
@@ -78,14 +79,26 @@ mp = Sequential([
     Dropout(0.2),
     Dense(1)
 ])
-mp.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
-history = mp.fit_generator(tsg, steps_per_epoch = 10, epochs = 500, verbose = 0)
+
+# Creating a checkpoint for saving the model
+co_cp = ModelCheckpoint('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/COmodel/co_cp.ckpt', save_best_only = True)
+
+# Compiling & fitting the model
+co_mod.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
+history = co_mod.fit_generator(
+    tsg, 
+    steps_per_epoch = 10, 
+    epochs = 500,
+    callbacks = [co_cp],
+    validation_data = co_test,
+    verbose = 0
+)
 
 # Test prediction
 x_in = array(co_test['CO_Mean'].tail(2)).reshape((1, n_in, n_feat))
-yhat = mp.predict(x_in, verbose = 0)
-print('Predicted daily avg. CO concentration: %s parts per million' % yhat[0][0])
-#print(so2avg['SO2_Mean'].tail())
+co_pred = co_mod.predict(x_in, verbose = 0)
+print('Predicted daily avg. CO concentration: %.3f parts per million' % co_pred[0][0])
+#print(co_avg['CO_Mean'].tail())
 
 # Plotting the metrics
 plt.rcParams['figure.figsize'] = (20, 10)
