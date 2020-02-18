@@ -9,7 +9,6 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
-from keras.callbacks import ModelCheckpoint
 from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
@@ -81,17 +80,12 @@ so2mod = Sequential([
     Dense(1)
 ])
 
-# Creating a checkpoint for saving the model
-so2_cp = ModelCheckpoint('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SO2model/so2cp.ckpt', save_best_only = True)
-
 # Compiling & fitting the model
 so2mod.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
 history = so2mod.fit_generator(
     tsg, 
     steps_per_epoch = 10,
     epochs = 500,
-    callbacks = [so2_cp],
-    validation_data = so2test,
     verbose = 0
 )
 

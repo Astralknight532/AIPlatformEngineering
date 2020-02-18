@@ -9,7 +9,6 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
-from keras.callbacks import ModelCheckpoint
 from numpy import array
 #import plotly.graph_objects as go
 #import plotly.express as px
@@ -80,17 +79,12 @@ o3mod = Sequential([
     Dense(1)
 ])
 
-# Creating a checkpoint for saving the model
-o3_cp = ModelCheckpoint('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/O3model/o3cp.ckpt', save_best_only = True)
-
 # Compiling & fitting the model
 o3mod.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
 history = o3mod.fit_generator(
     tsg, 
     steps_per_epoch = 10, 
     epochs = 500,
-    callbacks = [o3_cp],
-    validation_data = o3test,
     verbose = 0
 )
 
