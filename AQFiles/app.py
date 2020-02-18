@@ -7,8 +7,8 @@ def basic_route():
     """Render the base template"""
     return render_template("index.html")
 
-@app.route("/special")
-def special_route():
+@app.route("/predict")
+def predict_route():
     """Render an extended version of the base template"""
     return render_template("results.html")
 
