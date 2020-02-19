@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import tensorflow as tf
 import keras
 from keras.models import load_model
@@ -17,6 +17,15 @@ def home_page():
 
 @app.route("/", methods=["POST"])
 def predict_result():
-    return render_template("results.html")
+    date = request.form["dateentry"]
+    pol = request.form["polselect"]
+    avgconc = 0
+    avgconc_print = str(avgconc)
+    if pol == 'NO2' or pol == 'SO2':
+        avgconc_print += ' parts per billion'
+    elif pol == 'O3' or pol == 'CO':
+        avgconc_print += ' parts per million'
+    
+    return render_template("results.html", chosendate = date, pollutant = pol, avgconc = avgconc_print)
 
 app.run(debug = True)

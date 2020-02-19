@@ -12,11 +12,11 @@
         <p> By: Hanan Kwok</p>
     </header>
 
-    <form action="/", method="POST", id="AQform">
+    <form method="POST", action="/", id="AQform">
         <p>Enter a date (format: YYYY-MM-DD):</p>
-        <input type="text" placeholder="YYYY-MM-DD" id="dateentry"/>
+        <input type="text" placeholder="YYYY-MM-DD" name="dateentry"/>
         <p>Choose a pollutant:</p>
-        <select form="AQform" id="pollutantselect">
+        <select form="AQform" name="polselect">
             <option>NO2</option>
             <option>SO2</option>
             <option>O3</option>
@@ -26,7 +26,10 @@
             <input type="submit" value="Get Prediction"/>
         </p>
     </form>
-    {% block result %}
-    {% endblock %}
+    
+    <section>
+        {% block result %}
+        {% endblock %}
+    </section>
 </body>
 </html>
