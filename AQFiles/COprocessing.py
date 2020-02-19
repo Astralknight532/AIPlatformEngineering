@@ -3,13 +3,12 @@
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
-import math as m
-import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
 from numpy import array
+#import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
 #import os
@@ -88,26 +87,28 @@ history = co_mod.fit_generator(
     verbose = 0
 )
 
+# Save the model in a HDF5 file format (as a .h5 file)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5'
+co_mod.save(path, overwrite = True)
+
 # Test prediction
 x_in = array(co_test['CO_Mean'].tail(2)).reshape((1, n_in, n_feat))
 co_pred = co_mod.predict(x_in, verbose = 0)
 print('Predicted daily avg. CO concentration: %.3f parts per million' % co_pred[0][0])
-#print(co_avg['CO_Mean'].tail())
+print(co_avg['CO_Mean'].tail())
 
+'''
 # Plotting the metrics
 plt.rcParams['figure.figsize'] = (20, 10)
-plt.title('LSTM Model Metrics')
+plt.title('CO Data LSTM Model Metrics')
 plt.xlabel('Epochs')
 plt.ylabel('Model Error')
 plt.plot(history.history['mse'], label = 'MSE', color = 'red')
 plt.plot(history.history['loss'], label = 'MSLE', color = 'blue')
-for i in range(len(history.history['mse'])):
-    history.history['mse'][i] = m.sqrt(history.history['mse'][i])
-    
-plt.plot(history.history['mse'], label = 'RMSE', color = 'green')
 plt.legend()
 plt.show()
-    
+'''
+
 '''
 # CO daily avg. concentration (in PPM)
 co_fig = px.scatter(co_avg, x = 'Date_Local', y = 'CO_Mean', width = 3000, height = 2500)

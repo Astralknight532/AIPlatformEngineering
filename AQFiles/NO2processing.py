@@ -3,13 +3,12 @@
 # Import needed libraries
 import customfunctions as cf # a Python file with functions I wrote
 import pandas as pd
-import math as m
-import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
 from numpy import array
+#import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
 #import os
@@ -89,27 +88,26 @@ history = no2mod.fit_generator(
 )
 
 # Save the model in a HDF5 file format (as a .h5 file)
-no2mod.save('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/savedmodels/no2_model.h5', overwrite = True)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5'
+no2mod.save(path, overwrite = True)
 
 # Test prediction
 x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
 no2pred = no2mod.predict(x_in, verbose = 0)
 print('Predicted daily avg. NO2 concentration: %.3f parts per billion' % no2pred[0][0])
-#print(no2avg['NO2_Mean'].tail())
+print(no2avg['NO2_Mean'].tail())
 
+'''
 # Plotting the metrics
 plt.rcParams['figure.figsize'] = (20, 10)
-plt.title('LSTM Model Metrics')
+plt.title('NO2 Data LSTM Model Metrics')
 plt.xlabel('Epochs')
 plt.ylabel('Model Error')
 plt.plot(history.history['mse'], label = 'MSE', color = 'red')
 plt.plot(history.history['loss'], label = 'MSLE', color = 'blue')
-for i in range(len(history.history['mse'])):
-    history.history['mse'][i] = m.sqrt(history.history['mse'][i])
-    
-plt.plot(history.history['mse'], label = 'RMSE', color = 'green')
 plt.legend()
 plt.show()
+'''
 
 '''
 # Plotting the daily average concentration of each pollutant
