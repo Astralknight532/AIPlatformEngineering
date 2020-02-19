@@ -87,7 +87,7 @@ history = so2mod.fit_generator(
     epochs = 500,
     verbose = 0
 )
-
+'''
 # Save the model in a json file
 so2mod_json = so2mod.to_json()
 with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.json', 'w') as json_file:
@@ -96,12 +96,12 @@ with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_mod
 # Save the model weights in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_weights.h5'
 so2mod.save_weights(path, overwrite = True)
-
+'''
 # Test prediction
-x_in = array(so2test['SO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
+x_in = array(so2test['SO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
 so2pred = so2mod.predict(x_in, verbose = 0)
-print('Predicted daily avg. SO2 concentration: %.3f parts per billion' % so2pred[0][0])
-print(so2avg['SO2_Mean'].tail())
+print('Predicted daily avg. SO2 concentration: %.3f parts per billion\n' % so2pred[0][0])
+print(so2avg[so2avg['Date_Local'] == '2010-01-03'])
 
 '''
 # Plotting the metrics

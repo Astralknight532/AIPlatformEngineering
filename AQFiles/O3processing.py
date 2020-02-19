@@ -86,6 +86,7 @@ history = o3mod.fit_generator(
     epochs = 500,
     verbose = 0
 )
+'''
 # Save the model in a json file
 o3mod_json = o3mod.to_json()
 with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.json', 'w') as json_file:
@@ -94,12 +95,12 @@ with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_mode
 # Save the model weights in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_weights.h5'
 o3mod.save_weights(path, overwrite = True)
-
+'''
 # Test prediction
-x_in = array(o3test['O3_Mean'].tail(2)).reshape((1, n_in, n_feat))
+x_in = array(o3test['O3_Mean'].head(n_in)).reshape((1, n_in, n_feat))
 o3pred = o3mod.predict(x_in, verbose = 0)
-print('Predicted daily avg. O3 concentration: %.3f parts per million' % o3pred[0][0])
-print(o3avg['O3_Mean'].tail())
+print('Predicted daily avg. O3 concentration: %.3f parts per million\n' % o3pred[0][0])
+print(o3avg[o3avg['Date_Local'] == '2010-01-03'])
 
 '''
 # Plotting the metrics
