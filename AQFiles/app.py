@@ -17,9 +17,20 @@ def home_page():
 
 @app.route("/", methods=["POST"])
 def predict_result():
-    date = request.form["dateentry"]
-    pol = request.form["polselect"]
-    avgconc = 0
+    date = request.form["dateentry"] # Get the date entered by the user
+    pol = request.form["polselect"] # Get the pollutant chosen by the user 
+    avgconc = 0 # Create a variable to store the predicted avg. concentration for a pollutant
+
+    # Select the appropriate model based on the user's chosen pollutant
+    if pol == 'NO2':
+        print('NO2 Model')
+    elif pol == 'SO2':
+        print('SO2 Model')
+    elif pol == 'O3':
+        print('O3 Model')
+    elif pol == 'CO':
+        print('CO Model')
+
     avgconc_print = str(avgconc)
     if pol == 'NO2' or pol == 'SO2':
         avgconc_print += ' parts per billion'
