@@ -87,9 +87,14 @@ history = co_mod.fit_generator(
     verbose = 0
 )
 
-# Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5'
-co_mod.save(path, overwrite = True)
+# Save the model in a json file
+co_mod_json = co_mod.to_json()
+with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.json', 'w') as json_file:
+    json_file.write(co_mod_json)
+
+# Save the model weights in a HDF5 file format (as a .h5 file)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_weights.h5'
+co_mod.save_weights(path, overwrite = True)
 
 # Test prediction
 x_in = array(co_test['CO_Mean'].tail(2)).reshape((1, n_in, n_feat))

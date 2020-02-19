@@ -88,9 +88,14 @@ history = so2mod.fit_generator(
     verbose = 0
 )
 
-# Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5'
-so2mod.save(path, overwrite = True)
+# Save the model in a json file
+so2mod_json = so2mod.to_json()
+with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.json', 'w') as json_file:
+    json_file.write(so2mod_json)
+
+# Save the model weights in a HDF5 file format (as a .h5 file)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_weights.h5'
+so2mod.save_weights(path, overwrite = True)
 
 # Test prediction
 x_in = array(so2test['SO2_Mean'].tail(2)).reshape((1, n_in, n_feat))

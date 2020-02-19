@@ -1,15 +1,24 @@
 from flask import Flask, render_template, request
 import tensorflow as tf
 import keras
-from keras.models import load_model
+import loadmodels as lm
+import random
 
 app = Flask(__name__)
 
-# Loading the models
-no2_mod = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5')
-so2_mod = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5')
-o3_mod = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.h5')
-co_mod = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5')
+# Loading the models & weights
+# NO2 model
+global no2_model, no2_graph
+no2_model, no2_graph = lm.loadno2()
+# SO2 model
+global so2_model, so2_graph
+so2_model, so2_graph = lm.loadso2() 
+# O3 model
+global o3_model, o3_graph
+o3_model, o3_graph = lm.loado3()
+# CO model
+global co_model, co_graph
+co_model, co_graph = lm.loadco()
 
 @app.route("/", methods=["GET"])
 def home_page():
@@ -19,11 +28,14 @@ def home_page():
 def predict_result():
     date = request.form["dateentry"] # Get the date entered by the user
     pol = request.form["polselect"] # Get the pollutant chosen by the user 
-    avgconc = 0 # Create a variable to store the predicted avg. concentration for a pollutant
+    avgconc = round(random.uniform(0, 100), 3) # Create a variable to store the predicted avg. concentration for a pollutant
 
     # Select the appropriate model based on the user's chosen pollutant
     if pol == 'NO2':
         print('NO2 Model')
+        #with no2_graph.as_default():
+        #    avgconc = no2_model.predict(date)
+        #    print(avgconc)
     elif pol == 'SO2':
         print('SO2 Model')
     elif pol == 'O3':

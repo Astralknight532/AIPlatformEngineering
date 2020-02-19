@@ -8,7 +8,7 @@ from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
 from numpy import array
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
 #import os
@@ -87,9 +87,14 @@ history = no2mod.fit_generator(
     verbose = 0
 )
 
-# Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5'
-no2mod.save(path, overwrite = True)
+# Save the model in a json file
+no2mod_json = no2mod.to_json()
+with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.json', 'w') as json_file:
+    json_file.write(no2mod_json)
+
+# Save the model weights in a HDF5 file format (as a .h5 file)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_weights.h5'
+no2mod.save_weights(path, overwrite = True)
 
 # Test prediction
 x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))

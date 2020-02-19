@@ -86,10 +86,14 @@ history = o3mod.fit_generator(
     epochs = 500,
     verbose = 0
 )
+# Save the model in a json file
+o3mod_json = o3mod.to_json()
+with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.json', 'w') as json_file:
+    json_file.write(o3mod_json)
 
-# Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.h5'
-o3mod.save(path, overwrite = True)
+# Save the model weights in a HDF5 file format (as a .h5 file)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_weights.h5'
+o3mod.save_weights(path, overwrite = True)
 
 # Test prediction
 x_in = array(o3test['O3_Mean'].tail(2)).reshape((1, n_in, n_feat))
