@@ -8,7 +8,7 @@ from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import SGD
 from keras.preprocessing.sequence import TimeseriesGenerator
 from numpy import array
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
 #import os
@@ -45,7 +45,8 @@ no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 # Handle null values in the data
 for c_no2 in no2avg['NO2_Mean'].values:
     no2avg['NO2_Mean'] = no2avg['NO2_Mean'].fillna(no2avg['NO2_Mean'].mean())
-
+    
+'''
 # Splitting the data into train & test sets based on the date
 no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
 no2mask_test = (no2avg['Date_Local'] >= '2010-01-01')
@@ -96,7 +97,7 @@ x_in = array(no2test['NO2_Mean'].tail(2)).reshape((1, n_in, n_feat))
 no2pred = no2mod.predict(x_in, verbose = 0)
 print('Predicted daily avg. NO2 concentration: %.3f parts per billion' % no2pred[0][0])
 print(no2avg['NO2_Mean'].tail())
-
+'''
 '''
 # Plotting the metrics
 plt.rcParams['figure.figsize'] = (20, 10)
