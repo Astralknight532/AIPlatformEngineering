@@ -87,9 +87,14 @@ history = o3mod.fit_generator(
     verbose = 0
 )
 
+# Getting a summary of the model
+#print(no2mod.summary())
+
+'''
 # Save the model in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.h5'
 o3mod.save(path, overwrite = True)
+'''
 
 # Test prediction
 x_in = array(o3test['O3_Mean'].head(n_in)).reshape((1, n_in, n_feat))

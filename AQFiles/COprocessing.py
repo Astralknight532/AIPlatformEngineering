@@ -87,9 +87,14 @@ history = co_mod.fit_generator(
     verbose = 0
 )
 
+# Getting a summary of the model
+#print(no2mod.summary())
+
+'''
 # Save the model in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5'
 co_mod.save(path, overwrite = True)
+'''
 
 # Test prediction
 x_in = array(co_test['CO_Mean'].head(n_in)).reshape((1, n_in, n_feat))

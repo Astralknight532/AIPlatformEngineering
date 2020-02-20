@@ -87,6 +87,7 @@ history = no2mod.fit_generator(
     verbose = 0
 )
 
+# Getting a summary of the model
 #print(no2mod.summary())
 
 '''

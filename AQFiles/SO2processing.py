@@ -88,9 +88,14 @@ history = so2mod.fit_generator(
     verbose = 0
 )
 
+# Getting a summary of the model
+#print(so2mod.summary())
+
+'''
 # Save the model in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5'
 so2mod.save(path, overwrite = True)
+'''
 
 # Test prediction
 x_in = array(so2test['SO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
