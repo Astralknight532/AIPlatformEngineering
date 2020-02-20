@@ -1,24 +1,21 @@
 from flask import Flask, render_template, request
 import tensorflow as tf
 import keras
-import loadmodels as lm
+from keras.models import load_model
 import random
+#import loadmodels as lm
 
 app = Flask(__name__)
 
-# Loading the models & weights
+# Loading the models
 # NO2 model
-global no2_model, no2_graph
-no2_model, no2_graph = lm.loadno2()
+no2model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5') 
 # SO2 model
-global so2_model, so2_graph
-so2_model, so2_graph = lm.loadso2() 
+so2_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5') 
 # O3 model
-global o3_model, o3_graph
-o3_model, o3_graph = lm.loado3()
+o3_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.h5')
 # CO model
-global co_model, co_graph
-co_model, co_graph = lm.loadco()
+co_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5')
 
 @app.route("/", methods=["GET"])
 def home_page():
@@ -33,9 +30,6 @@ def predict_result():
     # Select the appropriate model based on the user's chosen pollutant
     if pol == 'NO2':
         print('NO2 Model')
-        #with no2_graph.as_default():
-        #    avgconc = no2_model.predict(date)
-        #    print(avgconc)
     elif pol == 'SO2':
         print('SO2 Model')
     elif pol == 'O3':

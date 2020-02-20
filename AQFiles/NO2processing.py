@@ -86,16 +86,11 @@ history = no2mod.fit_generator(
     epochs = 500,
     verbose = 0
 )
-'''
-# Save the model in a json file
-no2mod_json = no2mod.to_json()
-with open('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.json', 'w') as json_file:
-    json_file.write(no2mod_json)
 
-# Save the model weights in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_weights.h5'
-no2mod.save_weights(path, overwrite = True)
-'''
+# Save the model in a HDF5 file format (as a .h5 file)
+path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5'
+no2mod.save(path, overwrite = True)
+
 # Test prediction
 x_in = array(no2test['NO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
 no2pred = no2mod.predict(x_in, verbose = 0)
