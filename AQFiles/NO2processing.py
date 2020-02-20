@@ -87,9 +87,13 @@ history = no2mod.fit_generator(
     verbose = 0
 )
 
+#print(no2mod.summary())
+
+'''
 # Save the model in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5'
 no2mod.save(path, overwrite = True)
+'''
 
 # Test prediction
 x_in = array(no2test['NO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
