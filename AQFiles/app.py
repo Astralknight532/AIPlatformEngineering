@@ -28,15 +28,15 @@ def home_page():
 def predict_result():
     date = request.form["dateentry"] # Get the date entered by the user
     pol = request.form["polselect"] # Get the pollutant chosen by the user 
-    avgconc = 0 #round(random.uniform(0, 100), 3) # Create a variable to store the predicted avg. concentration for a pollutant
-    date = pd.to_datetime(date, format = '%Y-%m-%d')
-    pred_input = np.array([date - timedelta(days = 2), date - timedelta(days = 1)])
-    pred_input = np.array(pd.DataFrame(pred_input)).reshape((1, 2, 1))
+    avgconc = round(random.uniform(0, 100), 3) # Create a variable to store the predicted avg. concentration for a pollutant
+    #date = pd.to_datetime(date, format = '%Y-%m-%d')
+    #pred_input = np.array([date - timedelta(days = 2), date - timedelta(days = 1)])
+    #pred_input = np.array(pd.DataFrame(pred_input)).reshape((1, 2, 1))
     # Select the appropriate model based on the user's chosen pollutant
     if pol == 'NO2':
         print('NO2 Model')
-        no2pred = no2model.predict(pred_input)
-        avgconc = round(no2pred[0][0], 3)
+        #no2pred = no2model.predict(pred_input)
+        #avgconc = round(no2pred[0][0], 3)
     elif pol == 'SO2':
         print('SO2 Model')
     elif pol == 'O3':
