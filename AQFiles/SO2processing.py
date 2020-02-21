@@ -56,12 +56,15 @@ so2train, so2test = so2avg.loc[so2mask_train], so2avg.loc[so2mask_test]
 #print("SO2 testing set info: \n%s\n" % so2test.info())
 
 # Using the Keras TimeSeriesGenerator functionality to build a LSTM model
-ser = array(so2avg['SO2_Mean'].values)
+ser_train = array(so2train['SO2_Mean'].values)
+ser_test = array(so2test['SO2_Mean'].values)
 n_feat = 1
-ser = ser.reshape((len(ser), n_feat))
+ser_train = ser_train.reshape((len(ser_train), n_feat))
 n_in = 2
-tsg = TimeseriesGenerator(ser, ser, length = n_in, batch_size = 20)
-print('Number of samples: %d' % len(tsg))
+train_gen = TimeseriesGenerator(ser_train, ser_train, length = n_in, sampling_rate = 1, batch_size = 10)
+test_gen = TimeseriesGenerator(ser_test, ser_test, length = n_in, sampling_rate = 1, batch_size = 1)
+#print('Number of training samples: %d' % len(train_gen))
+#print('Number of testing samples: %d' % len(test_gen))
 
 # Defining an alternative optimizer
 opt = SGD(lr = 0.01, momentum = 0.9, nesterov = True)
@@ -82,7 +85,7 @@ so2mod = Sequential([
 # Compiling & fitting the model
 so2mod.compile(optimizer = opt, loss = 'mean_squared_logarithmic_error', metrics = ['mse'])
 history = so2mod.fit_generator(
-    tsg, 
+    train_gen, 
     steps_per_epoch = 10,
     epochs = 500,
     verbose = 0
