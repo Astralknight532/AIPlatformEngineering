@@ -1,8 +1,10 @@
 import numpy
+import pandas
 from datetime import timedelta
 
 date = pd.to_datetime('2010-01-01', format = '%Y-%m-%d')
 pred_input = numpy.array([date - timedelta(days = 2), date - timedelta(days = 1)])
-pred_input = numpy.array(pd.DataFrame(pred_input)).reshape((1, 2, 1))
-no2mod.predict(pred_input)
+pred_input = numpy.array(pandas.DataFrame(pred_input)).reshape((1, 2, 1))
+avgconc = no2mod.predict(pred_input)
 print(no2avg[no2avg['Date_Local'] == '2010-01-01'])
+print(avgconc[0][0])
