@@ -6,7 +6,6 @@ import random
 import pandas as pd
 import numpy as np
 from datetime import timedelta
-#import loadmodels as lm
 
 app = Flask(__name__)
 
