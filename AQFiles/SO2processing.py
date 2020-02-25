@@ -32,7 +32,7 @@ airpol_data = pd.read_csv(
 #print("The last 5 rows of the dataset: \n%s" % airpol_data.tail())
 
 # Select the columns for SO2 data
-# Concentration for SO2 is in parts per billion, Date_Local is in the format YYYY-MM-YY
+# Concentration for SO2 is in parts per billion, Date_Local is in the format YYYY-MM-DD
 so2avg = airpol_data[['Date_Local', 'SO2_Mean']]
 
 # Handle duplicate values in the data
