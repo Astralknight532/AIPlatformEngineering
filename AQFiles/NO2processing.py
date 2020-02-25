@@ -103,7 +103,7 @@ no2mod.save(path, overwrite = True)
 x_in = array(no2test['NO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
 no2pred = no2mod.predict(x_in, verbose = 0)
 print('Predicted daily avg. NO2 concentration: %.3f parts per billion\n' % no2pred[0][0])
-print(no2avg[no2avg['Date_Local'] == '2010-01-01'])
+print(no2avg[no2avg['Date_Local'] == '2010-01-03'])
 
 '''
 # Plotting the metrics
