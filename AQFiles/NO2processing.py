@@ -11,7 +11,7 @@ from numpy import array
 #import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
-#import os
+import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -46,6 +46,14 @@ no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 for c_no2 in no2avg['NO2_Mean'].values:
     no2avg['NO2_Mean'] = no2avg['NO2_Mean'].fillna(no2avg['NO2_Mean'].mean())
    
+# Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
+if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
+    os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
+    
+# Write the cleaned data to a separate CSV file
+cleaned_no2csv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_NO2data.csv"
+no2avg.to_csv(cleaned_no2csv, date_format = '%Y-%m-%d')   
+
 # Splitting the data into train & test sets based on the date
 no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
 no2mask_test = (no2avg['Date_Local'] >= '2010-01-01')

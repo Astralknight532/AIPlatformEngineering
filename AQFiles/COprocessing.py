@@ -11,7 +11,7 @@ from numpy import array
 #import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
-#import os
+import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -45,6 +45,14 @@ co_avg['CO_Mean'] = cf.float_convert(co_avg['CO_Mean'])
 # Handle null values in the data
 for c_co in co_avg['CO_Mean'].values:
     co_avg['CO_Mean'] = co_avg['CO_Mean'].fillna(co_avg['CO_Mean'].mean())
+
+# Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
+if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
+    os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
+    
+# Write the cleaned data to a separate CSV file
+cleaned_cocsv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_COdata.csv"
+co_avg.to_csv(cleaned_cocsv, date_format = '%Y-%m-%d') 
     
 # Splitting the data into train & test sets based on the date
 comask_train = (co_avg['Date_Local'] < '2010-01-01')
