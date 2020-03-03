@@ -11,7 +11,7 @@ from numpy import array
 #import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
-import os
+#import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -45,14 +45,16 @@ o3avg['O3_Mean'] = cf.float_convert(o3avg['O3_Mean'])
 # Handle null values in the data
 for c_o3 in o3avg['O3_Mean'].values:
     o3avg['O3_Mean'] = o3avg['O3_Mean'].fillna(o3avg['O3_Mean'].mean())
-
+    
+'''
 # Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
 if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
     os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
-    
+
 # Write the cleaned data to a separate CSV file
 cleaned_o3csv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_O3data.csv"
 o3avg.to_csv(cleaned_o3csv, date_format = '%Y-%m-%d') 
+'''
 
 # Splitting the data into train & test sets based on the date
 o3mask_train = (o3avg['Date_Local'] < '2010-01-01')
