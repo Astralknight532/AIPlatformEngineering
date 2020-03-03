@@ -11,7 +11,7 @@ from numpy import array
 #import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
-#import os
+import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -47,7 +47,11 @@ so2avg['SO2_Mean'].fillna(3, inplace = True, limit = 1) # Handling one of the mi
 for c_so2 in so2avg['SO2_Mean'].values:
     so2avg['SO2_Mean'] = so2avg['SO2_Mean'].fillna(so2avg['SO2_Mean'].mean())
 
-'''
+# Sort the data by the date from earliest to latest
+so2avg.sort_values(by = ['Date_Local'], ascending = True, inplace = True, kind = 'mergesort')
+#print(so2avg.head())
+#print(so2avg.tail())
+
 # Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
 if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
     os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
@@ -55,7 +59,6 @@ if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanDa
 # Write the cleaned data to a separate CSV file
 cleaned_so2csv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_SO2data.csv"
 so2avg.to_csv(cleaned_so2csv, date_format = '%Y-%m-%d') 
-'''
 
 # Splitting the data into train & test sets based on the date
 so2mask_train = (so2avg['Date_Local'] < '2010-01-01')
@@ -104,11 +107,9 @@ history = so2mod.fit_generator(
 # Getting a summary of the model
 #print(so2mod.summary())
 
-'''
 # Save the model in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5'
 so2mod.save(path, overwrite = True)
-'''
 
 # Test prediction
 x_in = array(so2test['SO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
@@ -126,9 +127,7 @@ plt.plot(history.history['mse'], label = 'MSE', color = 'red')
 plt.plot(history.history['loss'], label = 'MSLE', color = 'blue')
 plt.legend()
 plt.show()
-'''
 
-'''
 # SO2 daily avg. concentration (in PPB)
 so2fig = px.scatter(so2avg, x = 'Date_Local', y = 'SO2_Mean', width = 3000, height = 2500)
 so2fig.add_trace(go.Scatter(

@@ -11,7 +11,7 @@ from numpy import array
 #import matplotlib.pyplot as plt
 #import plotly.graph_objects as go
 #import plotly.express as px
-#import os
+import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
@@ -45,8 +45,12 @@ no2avg['NO2_Mean'] = cf.float_convert(no2avg['NO2_Mean'])
 # Handle null values in the data
 for c_no2 in no2avg['NO2_Mean'].values:
     no2avg['NO2_Mean'] = no2avg['NO2_Mean'].fillna(no2avg['NO2_Mean'].mean())
-    
-'''   
+
+# Sort the data by the date from earliest to latest
+no2avg.sort_values(by = ['Date_Local'], ascending = True, inplace = True, kind = 'mergesort')
+#print(no2avg.head())
+#print(no2avg.tail())
+
 # Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
 if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
     os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
@@ -54,14 +58,13 @@ if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanDa
 # Write the cleaned data to a separate CSV file
 cleaned_no2csv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_NO2data.csv"
 no2avg.to_csv(cleaned_no2csv, date_format = '%Y-%m-%d')   
-'''
 
 # Splitting the data into train & test sets based on the date
 no2mask_train = (no2avg['Date_Local'] < '2010-01-01')
 no2mask_test = (no2avg['Date_Local'] >= '2010-01-01')
 no2train, no2test = no2avg.loc[no2mask_train], no2avg.loc[no2mask_test]
 
-#print("NO2 training set info: \n%s\n" % no2train.info()) #3653 train, 366 test
+#print("NO2 training set info: \n%s\n" % no2train.info()) # 3653 train, 366 test
 #print("NO2 testing set info: \n%s\n" % no2test.info())
 
 # Using the Keras TimeSeriesGenerator functionality to build a LSTM model
@@ -103,11 +106,9 @@ history = no2mod.fit_generator(
 # Getting a summary of the model
 #print(no2mod.summary())
 
-'''
 # Save the model in a HDF5 file format (as a .h5 file)
 path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5'
 no2mod.save(path, overwrite = True)
-'''
 
 # Test prediction
 x_in = array(no2test['NO2_Mean'].head(n_in)).reshape((1, n_in, n_feat))
@@ -125,9 +126,7 @@ plt.plot(history.history['mse'], label = 'MSE', color = 'red')
 plt.plot(history.history['loss'], label = 'MSLE', color = 'blue')
 plt.legend()
 plt.show()
-'''
 
-'''
 # Plotting the daily average concentration of each pollutant
 # Checking for the folder that figures will be saved in, creating it if it doesn't exist
 if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures'):
