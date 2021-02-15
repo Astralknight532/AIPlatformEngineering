@@ -15,7 +15,7 @@ import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
-    "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/pollution_us_2000_2016.csv",
+    "C:/Users/hanan/Desktop/Personal Projects/AIPlatformEngineering/AQFiles/pollution_us_2000_2016.csv",
     header = 0, 
     parse_dates = ['Date_Local'],
     infer_datetime_format = True,
@@ -52,11 +52,11 @@ co_avg.sort_values(by = ['Date_Local'], ascending = True, inplace = True, kind =
 #print(co_avg.tail())
 
 # Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
-if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
-    os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
+if not os.path.exists('C:/Users/hanan/Desktop/Personal Projects/AIPlatformEngineering/AQFiles/cleanData'):
+    os.mkdir('C:/Users/hanan/Desktop/Personal Projects/AIPlatformEngineering/AQFiles/cleanData')
     
 # Write the cleaned data to a separate CSV file
-cleaned_cocsv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_COdata.csv"
+cleaned_cocsv = "C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData/cleaned_COdata.csv"
 co_avg.to_csv(cleaned_cocsv, date_format = '%Y-%m-%d') 
 
 # Splitting the data into train & test sets based on the date
@@ -107,7 +107,7 @@ history = co_mod.fit_generator(
 #print(no2mod.summary())
 
 # Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5'
+path = 'C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/co_model.h5'
 co_mod.save(path, overwrite = True)
 
 # Test prediction
@@ -148,5 +148,5 @@ co_fig.update_layout(
 )
 co_fig.update_xaxes(automargin = True)
 co_fig.update_yaxes(automargin = True)
-co_fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_co.png')
+co_fig.write_image('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/plotlyfigures/avg_co.png')
 '''

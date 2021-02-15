@@ -15,7 +15,7 @@ import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
-    "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/pollution_us_2000_2016.csv",
+    "C:/Users/hanan/Desktop/Personal Projects/AIPlatformEngineering/AQFiles/pollution_us_2000_2016.csv",
     header = 0, 
     parse_dates = ['Date_Local'],
     infer_datetime_format = True,
@@ -52,11 +52,11 @@ no2avg.sort_values(by = ['Date_Local'], ascending = True, inplace = True, kind =
 #print(no2avg.tail())
 
 # Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
-if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
-    os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
+if not os.path.exists('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData'):
+    os.mkdir('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData')
     
 # Write the cleaned data to a separate CSV file
-cleaned_no2csv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_NO2data.csv"
+cleaned_no2csv = "C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData/cleaned_NO2data.csv"
 no2avg.to_csv(cleaned_no2csv, date_format = '%Y-%m-%d')   
 
 # Splitting the data into train & test sets based on the date
@@ -107,7 +107,7 @@ history = no2mod.fit_generator(
 #print(no2mod.summary())
 
 # Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5'
+path = 'C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/no2_model.h5'
 no2mod.save(path, overwrite = True)
 
 # Test prediction
@@ -129,8 +129,8 @@ plt.show()
 
 # Plotting the daily average concentration of each pollutant
 # Checking for the folder that figures will be saved in, creating it if it doesn't exist
-if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures'):
-    os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures')
+if not os.path.exists('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/plotlyfigures'):
+    os.mkdir('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/plotlyfigures')
     
 # NO2 daily avg. concentration (in PPB)
 no2fig = px.scatter(no2avg, x = 'Date_Local', y = 'NO2_Mean', width = 3000, height = 2500)
@@ -153,5 +153,5 @@ no2fig.update_layout(
 )
 no2fig.update_xaxes(automargin = True)
 no2fig.update_yaxes(automargin = True)
-no2fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_no2.png')
+no2fig.write_image('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/plotlyfigures/avg_no2.png')
 '''

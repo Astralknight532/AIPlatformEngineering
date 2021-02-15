@@ -10,13 +10,13 @@ app = Flask(__name__)
 
 # Loading the models
 # NO2 model
-no2_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/no2_model.h5') 
+no2_model = load_model('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/no2_model.h5') 
 # SO2 model
-so2_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5') 
+so2_model = load_model('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/so2_model.h5') 
 # O3 model
-o3_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/o3_model.h5')
+o3_model = load_model('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/o3_model.h5')
 # CO model
-co_model = load_model('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/co_model.h5')
+co_model = load_model('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/co_model.h5')
 
 @app.route("/", methods=["GET"])
 def home_page():

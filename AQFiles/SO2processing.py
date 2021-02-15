@@ -15,7 +15,7 @@ import os
 
 # Read in the data set
 airpol_data = pd.read_csv(
-    "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/pollution_us_2000_2016.csv",
+    "C:/Users/hanan/Desktop/Personal Projects/AIPlatformEngineering/AQFiles/pollution_us_2000_2016.csv",
     header = 0, 
     parse_dates = ['Date_Local'],
     infer_datetime_format = True,
@@ -53,11 +53,11 @@ so2avg.sort_values(by = ['Date_Local'], ascending = True, inplace = True, kind =
 #print(so2avg.tail())
 
 # Checking for the folder that cleaned data will be saved in, creating it if it doesn't exist
-if not os.path.exists('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData'):
-    os.mkdir('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData')
+if not os.path.exists('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData'):
+    os.mkdir('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData')
     
 # Write the cleaned data to a separate CSV file
-cleaned_so2csv = "C:/Users/hanan/Desktop/PersonalRepository/AQFiles/cleanData/cleaned_SO2data.csv"
+cleaned_so2csv = "C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/cleanData/cleaned_SO2data.csv"
 so2avg.to_csv(cleaned_so2csv, date_format = '%Y-%m-%d') 
 
 # Splitting the data into train & test sets based on the date
@@ -108,7 +108,7 @@ history = so2mod.fit_generator(
 #print(so2mod.summary())
 
 # Save the model in a HDF5 file format (as a .h5 file)
-path = 'C:/Users/hanan/Desktop/PersonalRepository/AQFiles/SavedModels/so2_model.h5'
+path = 'C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/SavedModels/so2_model.h5'
 so2mod.save(path, overwrite = True)
 
 # Test prediction
@@ -149,5 +149,5 @@ so2fig.update_layout(
 )
 so2fig.update_xaxes(automargin = True)
 so2fig.update_yaxes(automargin = True)
-so2fig.write_image('C:/Users/hanan/Desktop/PersonalRepository/AQFiles/plotlyfigures/avg_so2.png')
+so2fig.write_image('C:/Users/hanan/Desktop/Personal Project/AIPlatformEngineering/AQFiles/plotlyfigures/avg_so2.png')
 '''
